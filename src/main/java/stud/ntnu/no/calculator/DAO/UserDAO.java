@@ -18,10 +18,6 @@ public class UserDAO {
   private JdbcTemplate jdbcTemplate;
   private static final Logger logger = LogManager.getLogger(UserDAO.class);
 
-  public int addUser(User user) {
-    return jdbcTemplate.update("INSERT INTO users VALUES (?, ?)", user.getUsername(), user.getPassword());
-  }
-
   public Optional<User> getUserByUsername(String username) {
     logger.info("Trying to execute sql");
     String sql = "SELECT * FROM users WHERE username=?";

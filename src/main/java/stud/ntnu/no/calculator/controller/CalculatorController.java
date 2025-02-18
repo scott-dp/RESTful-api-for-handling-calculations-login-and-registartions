@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import stud.ntnu.no.calculator.Service.CalculationService;
 import stud.ntnu.no.calculator.Service.UserService;
 import stud.ntnu.no.calculator.model.Calculation;
 import stud.ntnu.no.calculator.model.Result;
@@ -17,18 +18,30 @@ import stud.ntnu.no.calculator.model.User;
 public class CalculatorController {
   @Autowired
   UserService userService;
+  @Autowired
+  CalculationService calculationService;
+
   private static final Logger logger = LogManager.getLogger(CalculatorController.class);
   @CrossOrigin(origins = "http://localhost:5173")
   @PostMapping("/calculate")
-  public ResponseEntity<Result> calculateResult(@RequestBody Calculation calculation) {
-    logger.info("Requested calculation: " + calculation.getCalculation());
+  public ResponseEntity<Result> calculateResultAndStoreInDatabase(@RequestBody Calculation calculation) {
+    logger.info("Requested calculation: " + calculation.getCalculation() + " for user " + calculation.getUsername());
     Result result;
+    boolean wasCalculationAdded;
     try {
-      result = calculation.calculate();
+      result = calculationService.calculate(calculation);
       logger.info("calculation successful, result: " + result.getResult());
+      //Store in db using CalculationService
+      logger.info("Storing calculation in database");
+      wasCalculationAdded = calculationService.addCalculationToDatabase(calculation, result.getResult());
     } catch (Exception e) {
       logger.error("Error: " + e.getMessage());
       return ResponseEntity.badRequest().build();
+    }
+    if (!wasCalculationAdded) {
+      logger.error("Couldn't add calculation to database");
+    } else {
+      logger.info("Calculation added to database");
     }
     return ResponseEntity.ok(result);
   }
