@@ -44,4 +44,18 @@ public class CalculatorController {
     logger.info("Successfully logged in to user " + user.getUsername());
     return new ResponseEntity<>(HttpStatus.OK);
   }
+
+  @CrossOrigin(origins = "http://localhost:5173")
+  @PostMapping("/register")
+  public ResponseEntity<?> registerNewUser(@RequestBody User user) {
+    logger.info("Trying to create new user " + user.getUsername());
+    boolean userWasAdded = userService.setNewUser(user);
+    if (userWasAdded) {
+      logger.info("User successfully added");
+      return new ResponseEntity<>(HttpStatus.OK);
+    } else {
+      logger.error("User with given username already exists");
+      return new ResponseEntity<>(HttpStatus.CONFLICT);  //If username already exist in database
+    }
+  }
 }

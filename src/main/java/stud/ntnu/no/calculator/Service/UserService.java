@@ -20,6 +20,20 @@ public class UserService {
 
   public boolean areUserCredentialsValid(User user) {
     Optional<User> foundUser = userDAO.getUserByUsername(user.getUsername());
-    return foundUser.isPresent();
+    if (foundUser.isEmpty()) {
+      logger.error("No user found");
+      return false;
+    }
+    String storedPassword = foundUser.get().getPassword();
+    String givenPassword = user.getPassword();
+    logger.info("Stored password: "+storedPassword+". Given password: " + givenPassword);
+
+    return givenPassword.equals(storedPassword);
+  }
+
+  public boolean setNewUser(User user) {
+    int rowsAffected = userDAO.setNewUser(user);
+
+    return rowsAffected == 1;
   }
 }
