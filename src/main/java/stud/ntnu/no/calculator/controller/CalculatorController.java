@@ -59,20 +59,6 @@ public class CalculatorController {
   }
 
   @CrossOrigin(origins = "http://localhost:5173")
-  @PostMapping("/register")
-  public ResponseEntity<?> registerNewUser(@RequestBody User user) {
-    logger.info("Trying to create new user " + user.getUsername());
-    boolean userWasAdded = userService.setNewUser(user);
-    if (userWasAdded) {
-      logger.info("User successfully added");
-      return new ResponseEntity<>(HttpStatus.OK);
-    } else {
-      logger.error("User with given username already exists");
-      return new ResponseEntity<>(HttpStatus.CONFLICT);  //If username already exist in database
-    }
-  }
-
-  @CrossOrigin(origins = "http://localhost:5173")
   @GetMapping("/calculations/{username}")
   public ResponseEntity<?> getCalculationsOfUser(@PathVariable String username) {
     logger.info("Fetching all calculations of user " + username);
@@ -83,6 +69,12 @@ public class CalculatorController {
       logger.error("Error: " + e.getMessage());
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @CrossOrigin(origins = "http://localhost:5173")
+  @GetMapping("/users/{username}")
+  public ResponseEntity<?> getUserInfo(@PathVariable String username) {
+    return ResponseEntity.ok(username);
   }
 
 }
