@@ -3,9 +3,7 @@ package stud.ntnu.no.calculator.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import stud.ntnu.no.calculator.Service.CalculationService;
 import stud.ntnu.no.calculator.Service.UserService;
 import stud.ntnu.no.calculator.model.Calculation;
@@ -13,6 +11,8 @@ import stud.ntnu.no.calculator.model.Result;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import stud.ntnu.no.calculator.model.User;
+
+import java.util.List;
 
 @org.springframework.web.bind.annotation.RestController
 public class CalculatorController {
@@ -71,4 +71,18 @@ public class CalculatorController {
       return new ResponseEntity<>(HttpStatus.CONFLICT);  //If username already exist in database
     }
   }
+
+  @CrossOrigin(origins = "http://localhost:5173")
+  @GetMapping("/calculations/{username}")
+  public ResponseEntity<?> getCalculationsOfUser(@PathVariable String username) {
+    logger.info("Fetching all calculations of user " + username);
+    try {
+      List<Calculation> calculationList = calculationService.get10LatestCalculationsForUser(username);
+      return ResponseEntity.ok(calculationList);
+    } catch (Exception e) {
+      logger.error("Error: " + e.getMessage());
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }

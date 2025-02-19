@@ -19,14 +19,12 @@ public class UserDAO {
   private static final Logger logger = LogManager.getLogger(UserDAO.class);
 
   public Optional<User> getUserByUsername(String username) {
-    logger.info("Trying to execute sql");
+    logger.info("Trying to execute sql to get user with username " + username);
     String sql = "SELECT * FROM users WHERE username=?";
     Map<String, Object> resultMap = jdbcTemplate.queryForMap(sql, username);
     logger.info("Rows found: " + resultMap.size());
     logger.info("Found password: " + resultMap.get("password"));
-    logger.info("Sql executed");
     if (resultMap.isEmpty()) {
-      logger.info("No rows found");
       return Optional.empty();
     }
     User user = new User(username, (String) resultMap.get("password"));
